@@ -4,7 +4,7 @@ Daisyworld as described in Lovelock 1992
 Currently set up in the most simple configuration with only a single trophic level. Boundary conditions can be changed.
 
 To run Daisy World change working directory into the folder containing the DaisyWorld.py script.
-
+å
 Enter ```python DaisyWorld.py``` into the terminal.
 
 Warning: For large n-species or run time, computation time will be extensive.

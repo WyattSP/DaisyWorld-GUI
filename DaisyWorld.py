@@ -21,7 +21,7 @@ def init_species(n_species, step_size, run_time, random_albedo = True, albedo = 
     spec_P = pd.DataFrame(columns=range(n_species),index=range(rows))
     for i in range(n_species):
         spec_P = spec_P.rename(columns={i:'%s%i'%('Species_',1+i)})
-        
+
     if random_albedo == True:
         #Create dataframe to store species albedo (static)
         spec_A = [random.uniform(0,1) for i in range(n_species)]
@@ -71,7 +71,7 @@ def pop_increase_pl(aia,species_frame,Ti,y):
 
 def lum_change(rate,max_time):
     L = 0.6+(rate*(1.2/max_time))
-    #This is a good place to insert stochastic perturbation 
+    #This is a good place to insert stochastic perturbation
     return round(float(L),3)
 
 def new_pop(old_pop,pop_change):
@@ -84,7 +84,7 @@ def new_pop(old_pop,pop_change):
 #####Daisyworld_V2
 def make_daisy_v2(species_number, step_size, run_time, albedo=None, lumosity=None, Death_rate=None, Initial_populations=None):
     #Start parameters
-    #Constant parameters 
+    #Constant parameters
     #Input variables to usable values
     species_number = int(species_number)
     step_size = int(step_size)
@@ -106,7 +106,7 @@ def make_daisy_v2(species_number, step_size, run_time, albedo=None, lumosity=Non
         Death_rate = "random"
     else:
          Death_rate = [float(i) for i in Death_rate.split(",")]
-    #Inital populations  
+    #Inital populations
     if Initial_populations == "None" or Initial_populations == "" or Initial_populations == None:
         Initial_populations = None
     else:
@@ -162,15 +162,15 @@ def make_daisy_v2(species_number, step_size, run_time, albedo=None, lumosity=Non
         Apop_incr= pop_increase_pl(Apop_int[i],Apop_int,T_Temp,spec_y[i])+0.001
         #Calculate new population
         Apop = new_pop(Apop_int[i],Apop_incr)
-        spec_P.iloc[0,i] = Apop 
-    
+        spec_P.iloc[0,i] = Apop
+
     L_Lum = []
     L_Tc = []
     Time = []
-    
+
     L_Lum.append(L)
     L_Tc.append(Tc)
-    
+
     n_time = 0
     Time.append(n_time)
     for i in range(1,run_time):
@@ -183,12 +183,12 @@ def make_daisy_v2(species_number, step_size, run_time, albedo=None, lumosity=Non
         L_Lum.append(L)
         #Recalculate pop_cover
         x = pop_cover_pl(spec_P.iloc[n_time-1])
-        #Recalculate effective coverage    
+        #Recalculate effective coverage
         A = eff_coverage_pl(x,planet_albedo_pl(x,spec_P.iloc[n_time-1],spec_A),spec_P.iloc[n_time-1],spec_A)
         #Recalculate Temp
         Tc = eff_temp(S,L,A,sig)
         L_Tc.append(Tc)
-        ###New Populations for n-species 
+        ###New Populations for n-species
         for i in range(0,len(spec_A)):
             #Calculate new temperature
             T_Temp = temp_change_pl(spec_A[i],Tc,x,spec_P.iloc[n_time-1],spec_A)
@@ -197,14 +197,14 @@ def make_daisy_v2(species_number, step_size, run_time, albedo=None, lumosity=Non
             Apop_incr= pop_increase_pl(spec_P.iloc[n_time-1,i],spec_P.iloc[n_time-1],T_Temp,spec_y[i])+0.001
             #Calculate new population
             Apop = new_pop(spec_P.iloc[n_time-1,i],Apop_incr)
-            spec_P.iloc[n_time,i] = Apop 
+            spec_P.iloc[n_time,i] = Apop
     return spec_P, L_Lum, L_Tc, spec_A, spec_y, Time
 
 #Plot
 def plot_results(spec_A,Time,spec_P):
     fig, ax1 = plt.subplots()
     for i in range(0,len(spec_A)):
-        ax1.plot(Time, spec_P.iloc[:,i])
+        ax1.plot(Time, spec_P.iloc[:,i].to_numpy())
     ax1.tick_params(axis='y', labelcolor='black')
     ax2 = ax1.twinx()
     ax2.plot(Time, L_Tc, color='tab:red',linestyle='--')
@@ -234,8 +234,8 @@ def delete_figure_agg(figure_agg):
     plt.close('all')
 
 # All the stuff inside your window.
-layout = [[sg.T("Species",size=(10, 1)),sg.In("2",size=(10, 1),key="species")], 
-          [sg.T("Step Size",size=(10, 1)),sg.In("1",size=(10, 1),key="step")], 
+layout = [[sg.T("Species",size=(10, 1)),sg.In("2",size=(10, 1),key="species")],
+          [sg.T("Step Size",size=(10, 1)),sg.In("1",size=(10, 1),key="step")],
           [sg.T("Run Time",size=(10, 1)),sg.In("100",size=(10, 1),key="run_time")],
           [sg.T("Albedo",size=(10, 1)),sg.In("None",size=(20, 1),key="albedo")],
           [sg.T("Lumosity",size=(10, 1)),sg.In("None",size=(20, 1),key="lumosity")],
@@ -264,14 +264,14 @@ while True:
         lumosity = values["lumosity"]
         Death_rate =values["death_rate"]
         Initial_populations = values["initial_populations"]
-        
+
         #Run daisyworld
         spec_P, L_Lum, L_Tc, spec_A, spec_y, Time= make_daisy_v2(species_number,
                                                                  step_size,
                                                                  run_time,
                                                              albedo=albedo,
-                                                             lumosity=lumosity, 
-                                                             Death_rate=Death_rate, 
+                                                             lumosity=lumosity,
+                                                             Death_rate=Death_rate,
                                                              Initial_populations = Initial_populations)
         #Plot results
         fig = plt.figure()
@@ -282,5 +282,5 @@ while True:
         delete_figure_agg(fig_canvas_agg)
         fig = plt.figure()
         fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
-        
+
 window.close()
